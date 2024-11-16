@@ -1,0 +1,72 @@
+<%- include('../patch/topper.ejs') %>
+
+<div class="flex bg-black text-white min-h-screen">
+  <%- include('./profileSidebar.ejs') %>
+
+  <div class="container mx-auto p-6 flex-1">
+    <h1 class="text-3xl font-bold mb-6">Your Order History</h1>
+
+    <!-- Order List -->
+    <% if (orders.length === 0) { %>
+      <p class="text-gray-400 text-center">You have no orders yet.</p>
+    <% } else { %>
+      <ul class="space-y-6">
+        <% orders.forEach(order => { %> 
+          <% order.items.forEach(item => { %>
+            <li class="border border-gray-700 rounded-lg p-4 shadow-lg flex flex-col md:flex-row md:items-center justify-between">
+              
+              <!-- Product Image and Info -->
+              <div class="flex items-center md:w-1/2">
+                <a href="/order-detail/<%= order._id %>/<%= item._id %>" class="flex items-center">
+                  <% if (item.product) { %>
+                    <img
+                      src="<%= item.product.image[0] %>"
+                      alt="<%= item.product.name %>"
+                      class="w-20 h-20 object-cover rounded mr-4"
+                      style="height: 4cm; width: 4cm; padding-right: 5mm;"
+                    />
+                    <div>
+                      <h2 class="text-lg font-semibold truncate" ><%= item.product.name %></h2>
+                      <p class="text-sm text-gray-400">Category: <%= item.product.category.name %></p>
+                    </div>
+                  <% } else { %>
+                    <p class="text-sm text-gray-400">Product not found</p>
+                  <% } %>
+                </a>
+              </div>
+
+              <!-- Price -->
+              <div class="flex flex-col items-center mt-4 md:mt-0 md:items-center md:w-1/4">
+                <p class="text-lg font-medium">Price: ₹<%= item.discountPrice %></p>
+              </div>
+
+              <!-- Order Status -->
+              <div class="flex flex-col items-end mt-4 md:mt-0 md:w-1/4">
+                <p class="text-sm text-gray-400">
+                  <% if (item.itemStatus === 'Pending') { %>
+                    <span class="text-yellow-400">Pending on <%= order.orderedAt.toLocaleDateString() %></span>
+                  <% } else if (item.itemStatus === 'Shipped') { %>
+                    <span class="text-green-500">Shipped on <%= order.updatedAt.toLocaleDateString() %></span>
+                  <% } else if (item.itemStatus === 'Confirmed') { %>
+                    <span class="text-green-500">Confirmed on <%= order.updatedAt.toLocaleDateString() %></span>
+                  <% } else if (item.itemStatus === 'Delivered') { %>
+                    <span class="text-green-500">Delivered on <%= order.updatedAt.toLocaleDateString() %></span>
+                  <% } else if (item.itemStatus === 'Cancelled') { %>
+                    <span class="text-red-500">Cancelled on <%= order.updatedAt.toLocaleDateString() %></span>
+                  <% } else if (item.itemStatus === 'Returned') { %>
+                    <span class="text-red-500">Returned on <%= order.updatedAt.toLocaleDateString() %></span>
+                  <% } else if (item.itemStatus === 'Refunded') { %>
+                    <span class="text-red-500">Refunded on <%= order.updatedAt.toLocaleDateString() %></span>
+                  <% } %>
+                </p>
+              </div>
+              
+            </li>
+          <% }) %>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../patch/bottom.ejs') %>

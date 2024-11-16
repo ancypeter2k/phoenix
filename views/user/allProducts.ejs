@@ -1,0 +1,215 @@
+<style>
+  /* Additional CSS for touch devices */
+  .hover-touch:active .overlay {
+      opacity: 1;
+  }
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .animate-gradient {
+    animation: gradient 3s ease infinite;
+  }
+</style>
+
+<div class="bg-black text-white">
+
+    <%- include('../patch/topper.ejs') %>
+<!-- Stylish Heading with Animated Background -->
+<div class="relative bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 bg-[length:200%_100%] animate-gradient shadow-lg h-32 md:h-36 lg:h-40 flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 bg-[url('/api/placeholder/400/400')] opacity-10 mix-blend-overlay"></div>
+  <% if (searchQuery) { %>
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center almendra-sc-regular drop-shadow-lg transform hover:scale-105 transition-transform duration-300">
+      Search: "<%= searchQuery %>"
+    </h1>
+  <% } else { %>
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center almendra-sc-regular drop-shadow-lg transform hover:scale-105 transition-transform duration-300">
+      Collection
+    </h1>
+  <% } %>
+</div>
+
+<!-- Enhanced Filter and Sort Controls -->
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 my-8 px-6">
+  <!-- Category Filter -->
+  <div class="relative group w-full md:w-auto">
+    <label for="filter" class="text-white mb-3 font-medium block md:inline">Category</label>
+    <select id="filter" class="w-full md:w-auto bg-gray-800/50 backdrop-blur-sm text-white rounded-lg px-8 py-2.5 border border-gray-700 hover:border-orange-500 transition-all duration-300 focus:ring-2 focus:ring-orange-500 focus:outline-none appearance-none" onchange="filterProducts()">
+      <option value="all" <%= categoryFilter === 'all' ? 'selected' : '' %>>All Categories </option>
+      <% categories.forEach(category => { %>
+        <option value="<%= category.name %>" <%= categoryFilter === category.name ? 'selected' : '' %>><%= category.name %></option>
+      <% }) %>
+    </select>
+    <div class="absolute right-2 top-[60%] transform -translate-y-1/2 pointer-events-none text-orange-500">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </div>
+
+  <!-- Sorting Options -->
+  <div class="relative group w-full md:w-auto">
+    <label for="sort" class="text-white mb-2 font-medium block md:inline">Sort by</label>
+    <select id="sort" class="w-full md:w-auto bg-gray-800/50 backdrop-blur-sm text-white rounded-lg px-3 py-2.5 border border-gray-700 hover:border-orange-500 transition-all duration-300 focus:ring-2 focus:ring-orange-500 focus:outline-none appearance-none" onchange="filterProducts()">
+      <option value="latest" <%= sortOption === 'latest' ? 'selected' : '' %>>Latest Arrivals</option>
+      <option value="discount" <%= sortOption === 'discount' ? 'selected' : '' %>>Price: Low to High</option>
+      <option value="discount-desc" <%= sortOption === 'discount-desc' ? 'selected' : '' %>>Price: High to Low</option>
+      <option value="a-z" <%= sortOption === 'a-z' ? 'selected' : '' %>>Name: A to Z</option>
+      <option value="z-a" <%= sortOption === 'z-a' ? 'selected' : '' %>>Name: Z to A</option>
+    </select>
+    <div class="absolute right-3 top-[60%] transform -translate-y-1/2 pointer-events-none text-orange-500">
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Stylish Product Grid -->
+<% if (products.length === 0) { %>
+  <div class="min-h-[400px] flex flex-col items-center justify-center">
+    <i class="fas fa-search text-6xl text-gray-600 mb-4"></i>
+    <h1 class="text-3xl md:text-4xl text-gray-300 font-light">No products found</h1>
+    <p class="text-gray-500 mt-2">Try adjusting your search or filter criteria</p>
+  </div>
+<% } else { %>
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mb-12">
+    <% products.forEach(product => { %>
+      <div class="group relative bg-gradient-to-b from-gray-900 to-black rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+        <a href="/product/<%= product._id %>" class="block relative overflow-hidden aspect-[3/4]">
+          <img 
+          src="<%= product.image[0] %>" 
+          alt="<%= product.image[1] || 'Product image' %>" 
+          class="h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+        />        
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </a>
+        
+        <div class="p-6 space-y-3">
+          <span class="px-3 py-1 text-xs font-semibold bg-orange-500/20 text-orange-500 rounded-full">
+            <%= product.category.name %>
+          </span>
+          
+          <h3 class="text-lg font-bold text-white truncate">
+            <%= product.name %>
+          </h3>
+          
+          <div class="flex items-center justify-between">
+            <div class="space-y-1">
+              <% if (product.discountedPrice < product.price) { %>
+                <div class="flex items-center gap-2">
+                  <span class="text-xl font-bold text-white">₹<%= product.discountedPrice.toFixed(0) %></span>
+                  <span class="text-sm text-gray-400 line-through">₹<%= product.price %></span>
+                </div>
+                <span class="text-sm text-orange-500 font-semibold">
+                  <%= Math.round(((product.price - product.discountedPrice) / product.price) * 100) %>% OFF
+                </span>
+              <% } else { %>
+                <span class="text-xl font-bold text-white">₹<%= product.price %></span>
+              <% } %>
+            </div>
+            <form action="/cart/<%= product._id %>/add" method="POST" onclick="addToCart('<%= product._id %>')">
+              <button type="submit"
+              class="w-10 h-10 rounded-full bg-orange-500/20 hover:bg-orange-500 text-orange-500 hover:text-white flex items-center justify-center transition-all duration-300">
+              <i class="fas fa-cart-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </section>
+<% } %>
+
+<!-- Enhanced Pagination -->
+<div class="flex justify-center items-center space-x-2 my-12">
+  <% for (let i = 1; i <= totalPages; i++) { %>
+    <a 
+      href="?page=<%= i %>&category=<%= categoryFilter %>&sort=<%= sortOption %>&search=<%= searchQuery %>"
+      class="w-10 h-10 flex items-center justify-center rounded-lg <%= currentPage === i ? 'bg-orange-500 text-white' : 'bg-gray-800/50 text-gray-300 hover:bg-orange-500/20 hover:text-orange-500' %> transition-all duration-300"
+    >
+      <%= i %>
+    </a>
+  <% } %>
+</div>
+
+<!-- Stylish Advertisement Section -->
+<div class="relative overflow-hidden rounded-2xl mx-6 mb-12">
+  <div class="aspect-video relative group">
+    <img 
+      src='/images/Project (2).jpeg' 
+      alt="Advertisement" 
+      class=" object-cover transform group-hover:scale-105 transition-transform duration-700"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+  </div>
+</div>
+
+
+  
+    <%- include('../patch/bottom.ejs') %>
+  
+  </div>
+  <script>
+    function filterProducts() {
+      const category = document.getElementById('filter').value;
+      const sort = document.getElementById('sort').value;
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('category', category);
+      currentUrl.searchParams.set('sort', sort);
+      window.location.href = currentUrl.href;
+    }
+
+
+    function confirmDelete(e) {      
+        e.preventDefault();
+          // Success
+          Swal.fire({
+              icon: 'Adding to C',
+              title: 'are you sure',
+              text: 'Do you want to move the product to cart',
+              showConfirmButton: true,
+              showCancelButton:true,
+              confirmButtonText:'yes',
+              cancelButtonText:'Cancel',
+          }).then((result) => {
+              if(result.isConfirmed){
+                 e.target.submit()
+              }
+          });
+      }
+
+  async function handleAddToCart(productId) {
+  const quantityInput = document.getElementById(`quantity-${productId}`);
+  const addButton = document.getElementById(`addToCart-${productId}`);
+  const quantity = parseInt(quantityInput.value);
+
+  if (!quantity || quantity < 1) {
+    showMessage(productId, 'Please enter a valid quantity', true);
+    return;
+  }
+
+  try {
+    addButton.disabled = true;
+    const response = await fetch('/cart/'+productId+'/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId, quantity }) 
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      showMessage(productId, 'Added to cart!');
+    } else {
+      throw new Error(data.message || 'Failed to add to cart');
+    }
+  } catch (error) {
+    showMessage(productId, error.message, true);
+  } finally {
+    addButton.disabled = false;
+  }
+}
+
+      
+  </script>
+  

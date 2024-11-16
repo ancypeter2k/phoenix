@@ -1,0 +1,31 @@
+                
+                <button type="button" class="text-red-500 hover:text-red-700 ml-4 delete-item" data-product-id="<%= item.product._id %>">
+                  <i class="fas fa-trash"></i>
+                </button>
+
+
+            <form action="/cart/<%= product._id %>/add" method="POST"   onclick="addToCart(event)" >
+              <button type="submit" class="w-10 h-10 rounded-full bg-orange-500/20 hover:bg-orange-500 text-orange-500 hover:text-white flex items-center justify-center transition-all duration-300">
+                <i class="fas fa-cart-plus"></i>
+              </button>
+            </form>
+
+
+    function addToCart(e) {      
+        e.preventDefault();
+          // Success
+          Swal.fire({
+              icon: 'Adding to Cart',
+              title: 'are you sure',
+              text: 'Do you want to move the product to cart',
+              showConfirmButton: true,
+              showCancelButton:true,
+              confirmButtonText:'yes',
+              cancelButtonText:'Cancel',
+          }).then((result) => {
+              if(result.isConfirmed){
+                 e.target.submit()
+              }
+          });
+      }
+                  
