@@ -115,7 +115,6 @@ const postAddProduct = async (req, res) => {
     }
 
     
-
     // If there are validation errors, return them
     if (errors.length > 0) {
       req.flash('error',errors)
@@ -207,8 +206,10 @@ const getEditProduct = async (req, res) => {
 
   const postEditProduct = async (req, res) => {
   try {
-    console.log(`hai`)
+    
     const productId  = req.params.id;
+
+    console.log(`productId:`,productId);
 
     let product = await productModel.findById(productId)
 

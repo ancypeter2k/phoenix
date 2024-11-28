@@ -10,18 +10,30 @@
       <p><strong>Order Date:</strong> <%= order.orderedAt.toLocaleDateString() %></p>
       <p><strong>Payment Method:</strong> <%= order.paymentMethod %></p>
       <p><strong>Payment Status:</strong> <span class="font-semibold text-green-500"><%= order.paymentStatus %></span></p>
-      <p><strong>Order Status:</strong> <span class="font-semibold text-blue-500"><%= order.orderStatus %></span></p>
     </div>
   
     <!-- Shipping Address -->
-    <h3 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b border-gray-600 pb-2">Shipping Address</h3>
-    <div class="bg-gray-700 rounded-md p-4 mb-6">
-      <p><%= order.address.name %></p>
-      <p><%= order.address.buildingName %>, <%= order.address.street %></p>
-      <p><%= order.address.city %>, <%= order.address.state %>, <%= order.address.country %></p>
-      <p><%= order.address.pincode %></p>
-      <p>Phone: <%= order.address.mobile %></p>
-    </div>
+    <% if (order.orderStatus === 'Cancelled') { %>
+      <h3 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b border-gray-600 pb-2">Shipping Address</h3>
+      <div class="bg-gray-700 rounded-md p-4 mb-6">
+        <p>Address is not available because the order is cancelled.</p>
+      </div>
+    <% } else if (order.address) { %>
+      <h3 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b border-gray-600 pb-2">Shipping Address</h3>
+      <div class="bg-gray-700 rounded-md p-4 mb-6">
+        <p><%= order.address.name%></p>
+        <p><%= order.address.buildingName %>, <%= order.address.street %></p>
+        <p><%= order.address.city %>, <%= order.address.state %>, <%= order.address.country %></p>
+        <p><%= order.address.pincode %></p>
+        <p>Phone: <%= order.address.mobile %></p>
+      </div>
+    <% } else { %>
+      <h3 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b border-gray-600 pb-2">Shipping Address</h3>
+      <div class="bg-gray-700 rounded-md p-4 mb-6">
+        <p>Address information is not available.</p>
+      </div>
+    <% } %>
+
   
     <!-- Items Table -->
     <h3 class="text-xl font-bold mt-6 mb-4 text-orange-500 border-b border-gray-600 pb-2">Items</h3>

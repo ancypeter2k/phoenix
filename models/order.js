@@ -24,53 +24,53 @@ const orderSchema = new mongoose.Schema({
       discountPrice: {
         type: Number,
       },
-      discountAmount: {
+      
+      couponCode: {
+        type: String,
+      },
+      couponDiscountAmount: {
         type: Number,
       },
       itemTotal: {
         type: Number,
         required: true
       },
+      discountAmount: {
+        type: Number,
+      },
+      totalDiscount: {
+        type: Number,
+      },
       itemStatus: {
         type: String,
-        enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Refunded'],
+        enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned','Return Requested', 'Approved', 'Rejected', 'Refunded'],
         default: 'Pending',
       },
+      returnRequested: {
+        type: Boolean,
+        default: false,
+      },
+      returnReason: {
+        type: String,
+      },
+      returnStatus: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected', 'Refunded'],
+        default: 'Pending',
+      },
+      returnDate: {
+        type: Date,
+      },
+      returnProcessedAt: {
+        type: Date,
+      },
+
     },
   ],
   address: {
-    name:{
-      type:String,
-      required:true
-    },
-    buildingName:{
-      type:String,
-      required:true
-    },
-    street:{
-      type:String,
-      required:true
-    },
-    city:{
-      type:String,
-      required:true
-    },
-    state:{
-      type:String,
-      required:true
-    },
-    country:{
-      type:String,
-      required:true
-    },
-    pincode:{
-      type:String,
-      required:true
-    },
-    mobile:{
-      type:String,
-      required:true
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'address',
+    required: true,
   },
   subtotal: {
     type: Number,
@@ -92,8 +92,8 @@ const orderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Refunded'],
-    default: 'Pending',
+    enum: ['Pending', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Return Requested', 'Approved', 'Rejected', 'Refunded'],
+    
   },
   orderedAt: {
     type: Date,

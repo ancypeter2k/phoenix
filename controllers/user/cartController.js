@@ -1,5 +1,7 @@
 import cartModel from '../../models/cart.js';
 import productModel from '../../models/product.models.js';
+import Offer from '../../models/offer.js';
+import category from '../../models/category.models.js';
 
 //^ //  //  //   //  //         GET CART PAGE   //  //  //  //  //  //  //
 
@@ -47,6 +49,7 @@ export const addToCart = async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
     const userId = req.session.userID;
+    console.log('productId is achu',productId)
 
     // Validation
     if (!userId) {
@@ -59,7 +62,7 @@ export const addToCart = async (req, res) => {
     if (!productId) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Product ID is required' 
+        message: 'Product ID  is required' 
       });
     }
     
@@ -218,10 +221,10 @@ export const updateCartItemQuantity = async (req, res) => {
         total: cart.total,
         discount: cart.discount,
         items: cart.items.map(item => ({
-          product: item.product._id,
-          quantity: item.quantity,
-          price: item.product.price,
-          discountPrice: item.product.discountedPrice
+        product: item.product._id,
+        quantity: item.quantity,
+        price: item.product.price,
+        discountPrice: item.product.discountedPrice
         }))
       }
     });
@@ -314,4 +317,3 @@ export const deleteFromCart = async (req, res) => {
     });
   }
 };
-

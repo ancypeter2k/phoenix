@@ -12,23 +12,52 @@
   .animate-gradient {
     animation: gradient 3s ease infinite;
   }
+
+  @keyframes titleFloat {
+      0%, 50% { transform: translateY(0px); }
+      20% { transform: translateY(-10px); }
+    }
+    
+    @keyframes textGlow {
+      0%, 50% { text-shadow: 0 0 10px rgba(243, 168, 94, 0.8); }
+      20% { text-shadow: 0 0 20px rgb(232, 168, 83); }
+    }
+
+    .title-animation {
+      animation: ease-in-out infinite,  ease-in-out infinite;/*textGlow 1s   titleFloat 3s*/
+    }
+
+    .video-overlay::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1;
+    }
 </style>
 
 <div class="bg-black text-white">
 
     <%- include('../patch/topper.ejs') %>
 <!-- Stylish Heading with Animated Background -->
-<div class="relative bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-400 bg-[length:200%_100%] animate-gradient shadow-lg h-32 md:h-36 lg:h-40 flex items-center justify-center overflow-hidden">
-  <div class="absolute inset-0 bg-[url('/api/placeholder/400/400')] opacity-10 mix-blend-overlay"></div>
-  <% if (searchQuery) { %>
-    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center almendra-sc-regular drop-shadow-lg transform hover:scale-105 transition-transform duration-300">
-      Search: "<%= searchQuery %>"
+<div class="relative h-40 md:h-48 lg:h-56 overflow-hidden">
+  <!-- Video Background -->
+  <div class="absolute inset-0 w-full h-full video-overlay">
+    <video autoplay loop muted playsinline class="w-full h-full object-cover">
+      <source src="/images/vdoall.mp4" type="video/mp4">
+    </video>
+  </div>
+  
+  <!-- Title Container -->
+  <div class="relative z-10 h-full flex items-center justify-center">
+    <h1 class="title-animation text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center 
+               tracking-wider uppercase transition-all duration-300 hover:tracking-widest">
+      Latest Collection
     </h1>
-  <% } else { %>
-    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center almendra-sc-regular drop-shadow-lg transform hover:scale-105 transition-transform duration-300">
-      Collection
-    </h1>
-  <% } %>
+  </div>
 </div>
 
 <!-- Enhanced Filter and Sort Controls -->
@@ -71,7 +100,7 @@
     <p class="text-gray-500 mt-2">Try adjusting your search or filter criteria</p>
   </div>
 <% } else { %>
-  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mb-12">
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-6 mb-12"> <!---->
     <% products.forEach(product => { %>
       <div class="group relative bg-gradient-to-b from-gray-900 to-black rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
         <a href="/product/<%= product._id %>" class="block relative overflow-hidden aspect-[3/4]">
@@ -106,11 +135,27 @@
                 <span class="text-xl font-bold text-white">₹<%= product.price %></span>
               <% } %>
             </div>
-            <form action="/cart/<%= product._id %>/add" method="POST" onclick="addToCart('<%= product._id %>')">
-              <button type="submit"
-              class="w-10 h-10 rounded-full bg-orange-500/20 hover:bg-orange-500 text-orange-500 hover:text-white flex items-center justify-center transition-all duration-300">
-              <i class="fas fa-cart-plus"></i>
-            </button>
+            <form id="addToWishlistForm">
+              <button 
+                  type="button" 
+                  id="addToWishlistButton" 
+                  data-product-id1="<%= products._id %>"
+                  class="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                      <path 
+                          d="M12.001 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54l-1.45 1.31z" />
+                  </svg>
+              </button>
+          </form>                 
+            <form id="addToCartForm">
+              <button 
+                  type="button" 
+                  id="addToCartButton" 
+                  data-product-id="<%= product._id %>"
+                  class="w-10 h-10 rounded-full bg-orange-500/20 hover:bg-orange-500 text-orange-500 hover:text-white flex items-center justify-center transition-all duration-300">
+                  <i class="fas fa-cart-plus"></i>
+              </button>
+          </form>          
           </div>
         </div>
       </div>
@@ -130,17 +175,7 @@
   <% } %>
 </div>
 
-<!-- Stylish Advertisement Section -->
-<div class="relative overflow-hidden rounded-2xl mx-6 mb-12">
-  <div class="aspect-video relative group">
-    <img 
-      src='/images/Project (2).jpeg' 
-      alt="Advertisement" 
-      class=" object-cover transform group-hover:scale-105 transition-transform duration-700"
-    />
-    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-  </div>
-</div>
+  </section>
 
 
   
@@ -176,40 +211,90 @@
           });
       }
 
-  async function handleAddToCart(productId) {
-  const quantityInput = document.getElementById(`quantity-${productId}`);
-  const addButton = document.getElementById(`addToCart-${productId}`);
-  const quantity = parseInt(quantityInput.value);
 
-  if (!quantity || quantity < 1) {
-    showMessage(productId, 'Please enter a valid quantity', true);
-    return;
-  }
+      document.querySelectorAll('[data-product-id]').forEach(button => {
+    button.addEventListener('click', async function () {
+        const productId = this.getAttribute('data-product-id'); // Get the product ID from the button's attribute
+        
+        try {
+            const response = await fetch('/cart/:productId/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId }), // Send productId as JSON
+            });
 
-  try {
-    addButton.disabled = true;
-    const response = await fetch('/cart/'+productId+'/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ productId, quantity }) 
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product added to cart!',
+                    text: 'The product was successfully added to your cart.',
+                });
+                // Optional: Redirect or update the UI here
+            } else {
+                const errorData = await response.json();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: `Error: ${errorData.message}`,
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong!',
+                text: 'Please try again later.',
+            });
+        }
     });
+});
 
-    const data = await response.json();
-    
-    if (data.success) {
-      showMessage(productId, 'Added to cart!');
-    } else {
-      throw new Error(data.message || 'Failed to add to cart');
-    }
-  } catch (error) {
-    showMessage(productId, error.message, true);
-  } finally {
-    addButton.disabled = false;
-  }
-}
 
-      
-  </script>
+document.querySelectorAll('[data-product-id1]').forEach(button => {
+    button.addEventListener('click', async function (event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        
+        const productId = this.getAttribute('data-product-id1'); // Get the product ID from the button's attribute
+        
+        try {
+            const response = await fetch(`/wishlist/${productId}/add`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId }), // Send productId as JSON
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product added to Wishlist!',
+                    text: 'The product was successfully added to your wishlist.',
+                });
+                // Optional: Redirect or update the UI here
+            } else {
+                const errorData = await response.json();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: `Error: ${errorData.message}`,
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong!',
+                text: 'Please try again later.',
+            });
+        }
+    });
+});
+
+ </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   

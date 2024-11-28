@@ -1,5 +1,6 @@
 import productModel from "../../models/product.models.js";
 import categoryModel from "../../models/category.models.js";
+import Offer from "../../models/offer.js";
 
 //^ //  //  //   //  //         GET PRODUCTS BY CATEGORY   //  //  //  //  //  //  //
 export const getProductsByCategory = async (req, res) => {

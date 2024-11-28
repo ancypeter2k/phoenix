@@ -133,7 +133,7 @@
                 <div id="message-<%= product._id %>" class="hidden"></div>
               </div>
     <!-- Reviews Section -->
-          <div class="mt-8">
+          <div class="mt-4">
             <h3 class="text-2xl font-bold mb-4">Reviews</h3>
             <div class="space-y-6">
               <% if (product.reviews.length > 0) { %>
@@ -161,12 +161,12 @@
           
 
           <% if (user) { %>
-            <div class="mt-8">
+            <div class="mt-4">
               <h3 class="text-2xl font-bold mb-4">Write a Review</h3>
               <form action="/product/<%= product._id %>/review" method="POST">
-                <div class="mb-4">
-                  <label for="rating" class="block text-gray-700 text-sm">Rating</label>
-                  <select id="rating" name="rating" class="w-full text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-300">
+                <div class="mb-2">
+                  <label for="rating" class="block text-gray-500 text-sm">Rating</label>
+                  <select id="rating" name="rating" class="w-24 text-black rounded-md border-gray-300 shadow-sm focus:border-indigo-300">
                     <option value="1">1 Star</option>
                     <option value="2">2 Star</option>
                     <option value="3">3 Star</option>
@@ -176,7 +176,7 @@
                 </div>
                 <div class="mb-4">
                   <label for="comment" class="block text-black text-sm">Comment</label>
-                  <textarea id="comment" name="comment" rows="4" class="w-full p-2 border text-black border-gray-300 rounded"></textarea>
+                  <textarea id="comment" name="comment" placeholder="Comment" rows="4" class="w-42 p-2 border text-black border-gray-600 rounded"></textarea>
                 </div>
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
               </form>
@@ -288,10 +288,35 @@ async function handleAddToCart(productId) {
     const data = await response.json();
     
     if (data.success) {
-      showMessage(productId, 'Added to cart!');
-    } else {
-      throw new Error(data.message || 'Failed to add to cart');
+  // Display success modal
+  Swal.fire({
+    title: 'Success!',
+    text: 'Added to cart!',
+    icon: 'success',
+    confirmButtonText: 'OK',
+    customClass: {
+      popup: 'rounded-lg shadow-lg p-6 bg-gray-900 text-white',
+      title: 'text-lg font-bold text-green-500',
+      content: 'text-base',
+      confirmButton: 'bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700'
     }
+  });
+} else {
+  // Display error modal
+  Swal.fire({
+    title: 'Error!',
+    text: data.message || 'Failed to add to cart',
+    icon: 'error',
+    confirmButtonText: 'Retry',
+    customClass: {
+      popup: 'rounded-lg shadow-lg p-6 bg-gray-900 text-white',
+      title: 'text-lg font-bold text-red-500',
+      content: 'text-base',
+      confirmButton: 'bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700'
+    }
+  });
+}
+
   } catch (error) {
     showMessage(productId, error.message, true);
   } finally {

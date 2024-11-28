@@ -66,9 +66,6 @@ export const getAddressPage = async(req, res) => {
   }
 };
 
-
-
-
 //^ //  //  //   //  //          GET Add ADDRESS PAGE   //  //  //  //  //  //  //
 
 export const getAddAddressPage = async(req,res) => {
